@@ -61,7 +61,6 @@ const uint8_t SWITCHES[] = {SW1, SW2, SW3, SW5, SW6};
 
 #define PULSEGAPMIN_MS 300
 #define SENDBLINK_MS 200
-#define CYCLEGAPMIN_MS 90000
 
 #define INIT_DELAY_MS 2000
 
@@ -89,8 +88,6 @@ pkt_VAR(txPacket_);
 // SENSORS
 unsigned long pulseTimestamp_ = 0;
 unsigned long ledTimestamp_ = 0;
-
-bool pulseFirst_ = true;
 
 // SOFTWARE SERIAL
 SoftwareSerial HC12_Serial(HC12_RX, HC12_TX);
@@ -372,9 +369,6 @@ void sendBuffer()
 
 #endif // !MASTER
 
-
-
-
 //// SETUP
 void setup() 
 {
@@ -404,7 +398,6 @@ void setup()
   setupCPGpacket(&txPacket_);
   bufferPacket(&txPacket_);
   delay(INIT_DELAY_MS);
-  pulseFirst_ = true;
   #endif // !MASTER
 
   #ifdef MASTER
@@ -425,21 +418,13 @@ void loop() {
   {
     if ((millis() - pulseTimestamp_) > PULSEGAPMIN_MS)
     {
-      if (pulseFirst_)
-        pulseFirst_ = false;
-      else
-      {
-        sendBuffer();
-        // Turn on blink led
-        ledControl(LED_YELLOW, led_On);
-        ledTimestamp_ = millis();
-      }      
+      sendBuffer();
+      // Turn on blink led
+      ledControl(LED_YELLOW, led_On);
+      ledTimestamp_ = millis();    
     }
     pulseTimestamp_ = millis();
   }
-
-  if (!pulseFirst_ && ((millis() - pulseTimestamp_) > CYCLEGAPMIN_MS))
-    pulseFirst_ = true;
   
   #endif // !MASTER
 
