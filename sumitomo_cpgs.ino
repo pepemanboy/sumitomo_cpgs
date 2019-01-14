@@ -59,8 +59,9 @@
 
 const uint8_t SWITCHES[] = {SW1, SW2, SW3, SW5, SW6};
 
-#define CYCLEGAP_MS 1000
+#define PULSEGAPMIN_MS 300
 #define SENDBLINK_MS 200
+#define CYCLEGAPMIN_MS 90000
 
 #define INIT_DELAY_MS 2000
 
@@ -86,8 +87,10 @@ pkt_VAR(txPacket_);
 #endif // !MASTER
 
 // SENSORS
-unsigned long cycleTimestamp_ = 0;
+unsigned long pulseTimestamp_ = 0;
 unsigned long ledTimestamp_ = 0;
+
+bool pulseFirst_ = true;
 
 // SOFTWARE SERIAL
 SoftwareSerial HC12_Serial(HC12_RX, HC12_TX);
@@ -327,8 +330,8 @@ bool readCPGBuzzer()
   return !digitalRead(CPG_BUZZER);
 }
 
-/** Return cycle complete */
-bool cycleComplete()
+/** Return detection of pulse */
+bool pulseDetect()
 {
   return readCPGLed() && readCPGBuzzer();
 }
@@ -401,6 +404,7 @@ void setup()
   setupCPGpacket(&txPacket_);
   bufferPacket(&txPacket_);
   delay(INIT_DELAY_MS);
+  pulseFirst_ = true;
   #endif // !MASTER
 
   #ifdef MASTER
@@ -417,17 +421,26 @@ void loop() {
   if ((millis() - ledTimestamp_) > SENDBLINK_MS)
     ledControl(LED_YELLOW, led_Off);
   
-  if (cycleComplete())
+  if (pulseDetect())
   {
-    if ((millis() - cycleTimestamp_) > CYCLEGAP_MS)
+    if ((millis() - pulseTimestamp_) > PULSEGAPMIN_MS)
     {
-      sendBuffer();
-      // Turn on blink led
-      ledControl(LED_YELLOW, led_On);
-      ledTimestamp_ = millis();
+      if (pulseFirst_)
+        pulseFirst_ = false;
+      else
+      {
+        sendBuffer();
+        // Turn on blink led
+        ledControl(LED_YELLOW, led_On);
+        ledTimestamp_ = millis();
+      }      
     }
-    cycleTimestamp_ = millis();
+    pulseTimestamp_ = millis();
   }
+
+  if (!pulseFirst_ && ((millis() - pulseTimestamp_) > CYCLEGAPMIN_MS))
+    pulseFirst_ = true;
+  
   #endif // !MASTER
 
   #ifdef MASTER
