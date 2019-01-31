@@ -25,7 +25,7 @@ extern "C" {
 //// DEFINES
 
 /** Default static initialization value of packet object */
-#define pkt_INIT { 0, 0, 0, 0, 0}
+#define pkt_INIT {0, 0, 0, 0, {0}}
 
 /** Declare and initialize a packet variable */
 #define pkt_VAR(p) packet_t p = pkt_INIT

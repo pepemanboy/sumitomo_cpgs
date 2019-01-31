@@ -20,14 +20,31 @@ extern "C" {
 /** Commands */
 typedef enum
 {
-  cmd_CPGInfo,
+  cmd_CPGInitQuery,
+  cmd_CPGInfoQuery,
+  cmd_CPGInfoReply,
 }cmds_e;
 
 /** CPG info structure */
-typedef struct CPGInfo CPGInfo;
-struct CPGInfo
+typedef struct CPGInfoReply CPGInfoReply;
+struct CPGInfoReply
 {
   uint8_t cpg_id;
+  uint8_t cpg_count;
+  uint8_t cpg_sequence;
+};
+
+typedef struct CPGInfoQuery CPGInfoQuery;
+struct CPGInfoQuery
+{
+  uint8_t cpg_sequence;
+};
+
+/** CPG info structure */
+typedef struct CPGInitQuery CPGInitQuery;
+struct CPGInitQuery
+{
+  uint32_t cpg_channel;
 };
 
 #ifdef __cplusplus
