@@ -1,7 +1,5 @@
 /** @file
-  CPG Main file
-
-  Defines the CPG_Master class, wich inherits from CPG. 
+  CPG Main file for Arduino
 
   @date 2019-01-31
   @author pepemanboy
