@@ -44,7 +44,8 @@ struct CPGInfoQuery
 typedef struct CPGInitQuery CPGInitQuery;
 struct CPGInitQuery
 {
-  uint32_t cpg_channel;
+  uint8_t cpg_channel;
+  uint32_t cpg_address;
 };
 
 #ifdef __cplusplus

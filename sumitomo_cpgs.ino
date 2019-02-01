@@ -1,5 +1,5 @@
 // CONFIGURABLE DEFINES
-#define MASTER
+// #define MASTER
 #define DEBUG
 
 #ifdef MASTER

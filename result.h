@@ -30,6 +30,9 @@ typedef enum
   EFormat,
   EAddress,
   ECommand,
+  ETimeout,
+  EOverflow,
+  EId,
 }error_e;
 
 #endif // RESULT_H
