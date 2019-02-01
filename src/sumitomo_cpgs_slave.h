@@ -1,4 +1,36 @@
+/** @file
+  CPG Slave implementation
+
+  Defines the CPG_Slave class, wich inherits from CPG. 
+
+  @date 2019-01-31
+  @author pepemanboy
+
+  Copyright 2019 Cirotec Automation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy 
+  of this software and associated documentation files (the "Software"), to deal 
+  in the Software without restriction, including without limitation the rights 
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+  copies of the Software, and to permit persons to whom the Software is 
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in 
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+  SOFTWARE.
+*/
+
 #include "sumitomo_cpgs_common.h"
+
+#ifndef SUMITOMO_CPGS_SLAVE_H
+#define SUMITOMO_CPGS_SLAVE_H
 
 class CPG_Slave:CPG
 {
@@ -21,7 +53,14 @@ private:
   const pin_t switch_7_ = A2; ///< Switch 7 pin
   const pin_t switch_8_ = A3; ///< Switch 8 pin
 
-  const pin_t switches_[5] = {switch_1_, switch_2_, switch_3_, switch_5_, switch_6_}; ///< Usable switches for selecting address
+  const pin_t switches_[5] = {
+    switch_1_, 
+    switch_2_, 
+    switch_3_, 
+    switch_5_, 
+    switch_6_
+  }; ///< Usable switches for selecting address 
+    
 
   const uint16_t pulse_gap_min_ms_ = 300; ///< Minimum gap between pulses [ms]
   const uint16_t send_blink_ms_ = 200; ///< Send blink LED duration [ms]
@@ -174,7 +213,8 @@ public:
         if (r == Ok) 
         {     
           // CPG Info Query           
-          if (p->command == cmd_CPGInfoQuery && p->data_size == sizeof(CPGInfoQuery)) 
+          if (p->command == cmd_CPGInfoQuery && 
+            p->data_size == sizeof(CPGInfoQuery)) 
           {
             CPGInfoQuery *qry = (CPGInfoQuery*)&p->data;
             if (qry->cpg_sequence == sequence_)
@@ -184,11 +224,16 @@ public:
             }
             pulse_backup_ += pulse_count_;
             // Transmit info
-            CPGInfoReply c = {.cpg_id = address(), .cpg_count = pulse_backup_, .cpg_sequence = sequence_};
+            CPGInfoReply c = {
+              .cpg_id = address(), 
+              .cpg_count = pulse_backup_, 
+              .cpg_sequence = sequence_
+            };
             replyCPGInfo(master_address_, &c);            
           }
           // CPG Init query
-          else if (p->command == cmd_CPGInitQuery && p->data_size == sizeof(CPGInitQuery))
+          else if (p->command == cmd_CPGInitQuery && 
+            p->data_size == sizeof(CPGInitQuery))
           {
             CPGInitQuery *qry = (CPGInitQuery*)&p->data;
             if (qry->cpg_address & (1<<address()))
@@ -202,5 +247,5 @@ public:
   }  
 };
 
-
+#endif // SUMITOMO_CPGS_SLAVE_H
 

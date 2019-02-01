@@ -1,7 +1,7 @@
 /** @file
   CPG Main file
 
-  Defines the CPG_Master class, wich inherits from CPG. 
+  Calls setup and void loops of either master or slave.
 
   @date 2019-01-31
   @author pepemanboy
@@ -27,5 +27,32 @@
   SOFTWARE.
 */
 
-#include "src/sumitomo_cpgs_main.h"
+#ifndef SUMITOMO_CPGS_MAIN_H
+#define SUMITOMO_CPGS_MAIN_H
 
+/// CONFIGURABLE DEFINES
+#define MASTER
+#define DEBUG
+
+/// INSTANTIATE OBJECT
+#ifdef MASTER
+#include "sumitomo_cpgs_master.h"
+CPG_Master cpg;
+#else
+#include "sumitomo_cpgs_slave.h"
+CPG_Slave cpg;
+#endif
+
+/// ARDUINO SETUP FUNCTION
+void setup()
+{
+  cpg.setup();
+}
+
+/// ARDUINO LOOP FUNCTION
+void loop()
+{
+  cpg.loop();
+}
+
+#endif // SUMITOMO_CPGS_MAIN_H

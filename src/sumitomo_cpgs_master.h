@@ -1,10 +1,53 @@
+/** @file
+  CPG Master implementation
+
+  Defines the CPG_Master class, wich inherits from CPG. 
+
+  @date 2019-01-31
+  @author pepemanboy
+
+  Copyright 2019 Cirotec Automation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy 
+  of this software and associated documentation files (the "Software"), to deal 
+  in the Software without restriction, including without limitation the rights 
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+  copies of the Software, and to permit persons to whom the Software is 
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in 
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+  SOFTWARE.
+*/
+
 #include "sumitomo_cpgs_common.h"
 #include "sumitomo_cpgs_config.h"
+
+#ifndef SUMITOMO_CPGS_MASTER_H
+#define SUMITOMO_CPGS_MASTER_H
 
 class CPG_Master:CPG
 {
 
 private:
+  /// GET CONFIGURATION FROM FILE
+  const static uint8_t slave_number_ = {
+    SUMITOMO_CPGS_CONFIG_SLAVE_NUMBER
+  }; ///< Number of slaves for this master
+  const uint8_t slaves_[slave_number_] = {
+     #include "../cfg/slaves_config.h"
+  }; ///< Slaves addressable by this master
+  const static uint8_t master_channel_ = {
+    #include "../cfg/master_channel_config.h"
+  }; ///< Master HC12 channel
+
   /// CONFIGURATION
   const static pin_t led_blue_ = 8; ///< Blue LED
   const static pin_t hc12_tx_ = 3; ///< HC12 Tx pin
@@ -12,13 +55,8 @@ private:
   const static pin_t hc12_set_ = 7; ///< HC12 Set pin
   
   const static uint16_t rx_blink_ms_ = 200; ///< Blink time on RX
-  const static uint8_t master_channel_ = cpg_MASTER_CHANNEL; ///< Master HC12 channel
   const static uint16_t reply_timeout_ms = 100; ///< Reply timeout
-  
-  const static uint8_t slave_number_ = cpg_SLAVE_NUMBER; ///< Number of slaves for this master
-  const uint8_t slaves_[cpg_SLAVE_NUMBER] = cpg_SLAVES; ///< Slaves for this master
-
-  const static uint8_t fault_threshold_ = 10; ///< Allowed consecutive faults from a slave
+  const static uint8_t fault_threshold_ = 10; ///< Allowed slave faults
 
   /// VARIABLES
   uint32_t led_timestamp_ = 0; ///< Timestamp of LED turn on
@@ -72,7 +110,10 @@ public:
     for (uint8_t i = 0; i < slave_number_; ++i)
       init_slaves_ |= 1<<slaves_[i];    
       
-    CPGInitQuery c = {.cpg_channel = master_channel_, .cpg_address = init_slaves_};
+    CPGInitQuery c = {
+      .cpg_channel = master_channel_, 
+      .cpg_address = init_slaves_
+    };
     queryCPGInit(&c);
     
     HC12_setup(master_channel_);
@@ -103,7 +144,8 @@ public:
         r = packetRx(p, rx_buffer_, l-1);
         if (r == Ok) 
         {                
-          if (p->command == cmd_CPGInfoReply && p->data_size == sizeof(CPGInfoReply)) 
+          if (p->command == cmd_CPGInfoReply && 
+            p->data_size == sizeof(CPGInfoReply)) 
           {
             CPGInfoReply *rpy = (CPGInfoReply*)&p->data;
             if (rpy->cpg_id == slaves_[i])
@@ -131,11 +173,15 @@ public:
     if (init_slaves_)
     {
       HC12_setup(home_channel_);
-      CPGInitQuery c = {.cpg_channel = master_channel_, .cpg_address = init_slaves_};
+      CPGInitQuery c = {
+        .cpg_channel = master_channel_, 
+        .cpg_address = init_slaves_
+      };
       queryCPGInit(&c);
       HC12_setup(master_channel_);
     }
   }
 };
 
+#endif // SUMITOMO_CPGS_MASTER_H
 

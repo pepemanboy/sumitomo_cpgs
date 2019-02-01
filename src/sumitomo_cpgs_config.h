@@ -1,14 +1,15 @@
 /** @file
-  CPG Main file
+	Configuration file.
+  
+  Obtains configurations from text files "cfg/slaves_config.h" and
+  "cfg/master_channel_config.h" and creates variables with them.
 
-  Defines the CPG_Master class, wich inherits from CPG. 
+	@date 2019-01-31
+	@author pepemanboy
 
-  @date 2019-01-31
-  @author pepemanboy
+	Copyright 2019 Cirotec Automation
 
-  Copyright 2019 Cirotec Automation
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy 
+	Permission is hereby granted, free of charge, to any person obtaining a copy 
   of this software and associated documentation files (the "Software"), to deal 
   in the Software without restriction, including without limitation the rights 
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
@@ -27,5 +28,22 @@
   SOFTWARE.
 */
 
-#include "src/sumitomo_cpgs_main.h"
+#ifndef SUMITOMO_CPGS_CONFIG_H
+#define SUMITOMO_CPGS_CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const uint8_t SUMITOMO_CPGS_CONFIG_SLAVES[] = {
+  #include "../cfg/slaves_config.h"
+};
+
+const uint8_t SUMITOMO_CPGS_CONFIG_SLAVE_NUMBER = 
+  sizeof(SUMITOMO_CPGS_CONFIG_SLAVES);
+
+#ifdef __cplusplus
+} // extern "C" 
+#endif
+
+#endif // SUMITOMO_CPGS_CONFIG_H
