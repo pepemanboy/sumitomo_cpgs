@@ -164,7 +164,7 @@ public:
       {        
         debug((char *)"Received reply");
         packet_t *p = &rx_packet_;
-        r = packetRx(p, rx_buffer_, l-1);
+        r = packetRx(p, rx_buffer_, l);
         if (r == Ok) 
         {                
           if (p->command == cmd_CPGInfoReply && 

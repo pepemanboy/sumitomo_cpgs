@@ -140,7 +140,11 @@ protected:
       return EParse; 
     }
     else
-    {       
+    {
+      char buf[20] = "";
+      sprintf(buf, "rx add %d", p->address);
+      debug(buf);
+
       if (pktCheck(p))
       {
         if (p->address != address() && p->address != broadcast_address_) {
