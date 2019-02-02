@@ -194,7 +194,7 @@ protected:
       
     // Set baud rate
     debug((char *)"Configuring baudrate");
-    sprintf(buf, "AT+B%lu", hc12_baudrate_);
+    sprintf(buf, "AT+B9600");
     r = HC12_configure_parameter(buf);
     if (r != Ok)
       return r;
