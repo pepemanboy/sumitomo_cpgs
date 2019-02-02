@@ -105,6 +105,7 @@ protected:
   /** Error function */
   void error()
   {
+    debug((char *)"Fatal error.");
     while(1)
     {
       digitalWrite(led_error_, HIGH);
@@ -172,6 +173,8 @@ protected:
   {
     res_t r;
     pinMode(hc12_set_, OUTPUT);
+
+    debug((char *)"Starting HC12 setup");
   
     HC12.setTimeout(serial_timeout_ms_);
     HC12.begin(9600); // Default baudrate per datasheet
@@ -202,6 +205,8 @@ protected:
     digitalWrite(hc12_set_, HIGH); // Exit setup mode
     delay(250); // As per datasheet    
     hc12_channel_ = channel; // Acknowledge channel set
+
+    debug((char *)"Finished HC12 setup");
     
     return Ok;
   }
@@ -213,6 +218,7 @@ protected:
     uint8_t retries = 0;
     while((r = HC12_setup(channel)) != Ok)
     {
+      debug((char *)"Retrying");
       if (retries++ > hc12_setup_retries_max_)
         error();
     }

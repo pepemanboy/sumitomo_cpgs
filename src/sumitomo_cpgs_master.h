@@ -125,7 +125,9 @@ public:
       .cpg_channel = master_channel_, 
       .cpg_address = slaves_mask_
     };
+
     queryCPGInit(&c);
+    debug((char *)"Sent query CPG Init");
     
     HC12_setup_retry(master_channel_);
   }
@@ -134,7 +136,7 @@ public:
   void loop() 
   {    
     res_t r = Ok;
-    
+
     // Reset blinking LED
     ledBlinkReset();
 
@@ -150,6 +152,9 @@ public:
       // Query Info
       CPGInfoQuery c = {.cpg_sequence = sequences_[i]};
       queryCPGInfo(slaves_[i], &c);
+      char buf[10] = "";
+      sprintf(buf, "qry slv %d", slaves_[i]);
+      debug(buf);
 
       // Wait for reply
       size_t l = HC12.readBytesUntil(0, rx_buffer_, sizeof(rx_buffer_));
@@ -157,6 +162,7 @@ public:
       // Process reply
       if (l)
       {        
+        debug((char *)"Received reply");
         packet_t *p = &rx_packet_;
         r = packetRx(p, rx_buffer_, l-1);
         if (r == Ok) 
@@ -173,11 +179,21 @@ public:
               ledBlinkStart();
             }
             else // Id mismatch
+            {
+              debug((char *)"Id error");
               r = EId;
+            }
           }
           else // Command mismatch
+          {
+            debug((char *)"Command error");
             r = ECommand;            
+          }
         }
+      }
+      else
+      {
+        debug((char *)"No reply");
       }
 
     }
@@ -185,6 +201,7 @@ public:
     // Send slaves
     if ((millis() - init_timestamp_) > init_period_ms_)
     {
+      debug((char *)"Send init");
       HC12_setup_retry(home_channel_);
       CPGInitQuery c = {
       .cpg_channel = master_channel_, 
@@ -192,6 +209,7 @@ public:
       };
       queryCPGInit(&c);
       HC12_setup_retry(master_channel_);
+      debug((char *)"Finish sending init");
       init_timestamp_ = millis();
     }
 
