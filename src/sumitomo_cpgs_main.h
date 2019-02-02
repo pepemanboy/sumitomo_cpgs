@@ -31,7 +31,7 @@
 #define SUMITOMO_CPGS_MAIN_H
 
 /// CONFIGURABLE DEFINES
-// #define MASTER
+#define MASTER
 #define DEBUG
 
 /// INSTANTIATE OBJECT

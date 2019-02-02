@@ -170,7 +170,7 @@ public:
           if (p->command == cmd_CPGInfoReply && 
             p->data_size == sizeof(CPGInfoReply)) 
           {
-            CPGInfoReply *rpy = (CPGInfoReply*)&p->data;
+            CPGInfoReply *rpy = (CPGInfoReply*)p->data;
             if (rpy->cpg_id == slaves_[i])
             {
               sequences_[i] = rpy->cpg_sequence;

@@ -122,7 +122,7 @@ protected:
     packet_t *p = &tx_packet_;
     p->address = address;
     p->command = command;      
-    pktUpdate(p, &data, data_length);      
+    pktUpdate(p, data, data_length);      
     pktRefresh(p);
     size_t len = sizeof(tx_buffer_);
     pktSerialize(p, (uint8_t *) tx_buffer_, &len);
@@ -134,7 +134,7 @@ protected:
   /** Process received packet in buffer and store it in a packet*/
   res_t packetRx(packet_t *p, const char *buf, size_t buf_len)
   {
-    res_t r = pktDeserialize(p, (uint8_t *)&buf, buf_len);
+    res_t r = pktDeserialize(p, (uint8_t *)buf, buf_len);
     if (!r) {
       return EParse; 
     }
