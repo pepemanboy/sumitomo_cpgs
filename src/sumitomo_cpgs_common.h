@@ -132,6 +132,8 @@ protected:
     debug(buf);
     sprintf(buf, "tx cmd %d", p->command);
     debug(buf);
+    sprintf(buf, "tx len %d", len);
+    debug(buf);
 
     HC12.write(tx_buffer_, len);
     HC12.write((uint8_t)0); 
@@ -161,7 +163,8 @@ protected:
       else {
         return EFormat;
       }
-    }   
+    }  
+    return Ok; 
   }
 
 private:

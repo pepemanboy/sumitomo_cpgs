@@ -273,15 +273,15 @@ public:
         }
         else
         {
+          char buf[20] = "";
+          sprintf(buf, "pkt err %d", r);
+          debug(buf);
           debug((char *)"Packet error");
         }
       }
       else
       {
         debug((char *)"Read error");
-        char buf[20] = "";
-        sprintf(buf, "rd err %d", r);
-        debug(buf);
       }
     }
   }  
