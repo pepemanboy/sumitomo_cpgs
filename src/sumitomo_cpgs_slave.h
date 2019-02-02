@@ -37,21 +37,21 @@ class CPG_Slave:CPG
   
 private:
   /// CONFIGURATION
-  const pin_t cpg_led_ = 2; ///< CPG Led pin
-  const pin_t cpg_buzzer_ = 3; ///< CPG Buzzer pin
+  const static pin_t cpg_led_ = 2; ///< CPG Led pin
+  const static pin_t cpg_buzzer_ = 3; ///< CPG Buzzer pin
   
   const static pin_t led_green_ = 7; ///< Green LED pin
   const static pin_t led_yellow_ = 8; ///< Yellow LED pin
   const static pin_t led_red_ = 9; ///< Red LED pin
 
-  const pin_t switch_1_ = 10; ///< Switch 1 pin
-  const pin_t switch_2_ = 11; ///< Switch 2 pin
-  const pin_t switch_3_ = 12; ///< Switch 3 pin
-  const pin_t switch_4_ = 13; ///< Switch 4 pin
-  const pin_t switch_5_ = A0; ///< Switch 5 pin
-  const pin_t switch_6_ = A1; ///< Switch 6 pin
-  const pin_t switch_7_ = A2; ///< Switch 7 pin
-  const pin_t switch_8_ = A3; ///< Switch 8 pin
+  const static pin_t switch_1_ = 10; ///< Switch 1 pin
+  const static pin_t switch_2_ = 11; ///< Switch 2 pin
+  const static pin_t switch_3_ = 12; ///< Switch 3 pin
+  const static pin_t switch_4_ = 13; ///< Switch 4 pin
+  const static pin_t switch_5_ = A0; ///< Switch 5 pin
+  const static pin_t switch_6_ = A1; ///< Switch 6 pin
+  const static pin_t switch_7_ = A2; ///< Switch 7 pin
+  const static pin_t switch_8_ = A3; ///< Switch 8 pin
 
   const pin_t switches_[5] = {
     switch_1_, 
@@ -61,10 +61,10 @@ private:
     switch_6_
   }; ///< Usable switches for selecting address 
 
-  const uint16_t pulse_gap_min_ms_ = 300; ///< Minimum gap between pulses [ms]
-  const uint16_t tx_blink_ms_ = 200; ///< Send blink LED duration [ms]
-  const uint16_t init_delay_ms = 2000; ///< Initialization delay [ms]
-  const uint16_t pulse_blink_ms_ = 200; ///< Pulse blink LED duration [ms]
+  const static uint16_t pulse_gap_min_ms_ = 300; ///< Minimum gap between pulses [ms]
+  const static uint16_t tx_blink_ms_ = 200; ///< Send blink LED duration [ms]
+  const static uint16_t init_delay_ms = 2000; ///< Initialization delay [ms]
+  const static uint16_t pulse_blink_ms_ = 200; ///< Pulse blink LED duration [ms]
 
 private:
   /// VARIABLES
@@ -108,7 +108,7 @@ private:
   /** Setup switches */
   void switchesSetup()
   {
-    for(uint8_t i = 0; sizeof(switches_); ++i)
+    for(uint8_t i = 0; i < sizeof(switches_); ++i)
       pinMode(switches_[i], INPUT);
   }
 
@@ -129,6 +129,9 @@ private:
       reading = digitalRead(switches_[i]) ? 0 : 1;
       val |= reading << i;
     }
+    char buf[10];
+    sprintf("sw %d", val);
+    debug(buf);
     return val;
   }
 
