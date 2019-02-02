@@ -40,9 +40,9 @@ private:
   const pin_t cpg_led_ = 2; ///< CPG Led pin
   const pin_t cpg_buzzer_ = 3; ///< CPG Buzzer pin
   
-  const pin_t led_green_ = 7; ///< Green LED pin
-  const pin_t led_yellow_ = 8; ///< Yellow LED pin
-  const pin_t led_red_ = 9; ///< Red LED pin
+  const static pin_t led_green_ = 7; ///< Green LED pin
+  const static pin_t led_yellow_ = 8; ///< Yellow LED pin
+  const static pin_t led_red_ = 9; ///< Red LED pin
 
   const pin_t switch_1_ = 10; ///< Switch 1 pin
   const pin_t switch_2_ = 11; ///< Switch 2 pin
@@ -60,16 +60,17 @@ private:
     switch_5_, 
     switch_6_
   }; ///< Usable switches for selecting address 
-    
 
   const uint16_t pulse_gap_min_ms_ = 300; ///< Minimum gap between pulses [ms]
-  const uint16_t send_blink_ms_ = 200; ///< Send blink LED duration [ms]
+  const uint16_t tx_blink_ms_ = 200; ///< Send blink LED duration [ms]
   const uint16_t init_delay_ms = 2000; ///< Initialization delay [ms]
+  const uint16_t pulse_blink_ms_ = 200; ///< Pulse blink LED duration [ms]
 
 private:
   /// VARIABLES
   uint32_t pulse_timestamp_ = 0; ///< Timestamp of last pulse
-  uint32_t led_timestamp_ = 0; ///< Timestamp of last time LED turned on
+  uint32_t led_yellow_timestamp_ = 0; ///< Timestamp of yellow LED
+  uint32_t led_red_timestamp_ = 0; ///< Timestamp of red LED
   uint8_t pulse_count_ = 0; ///< Pulse count
   uint8_t pulse_backup_ = 0; ///< Pulse count backup
   uint8_t sequence_ = 0; ///< Communication sequence
@@ -157,11 +158,32 @@ private:
       if ((millis() - pulse_timestamp_) > pulse_gap_min_ms_)
       {
         pulse_count_++;
-        ledControl(led_yellow_, led_On);
-        led_timestamp_ = millis();    
+        debug((char *)"Detected pulse");
+        ledBlinkStart(led_yellow_);
       }
       pulse_timestamp_ = millis();
     }
+  }
+
+  /** Start blinking LED */
+  void ledBlinkStart(pin_t led)
+  {
+    ledControl(led, led_On);
+    switch(led)
+    {
+      case led_yellow_: led_yellow_timestamp_ = millis(); break;
+      case led_red_: led_red_timestamp_ = millis(); break;
+    }    
+  }
+
+  /** Reset blinking LED */
+  void ledBlinkReset()
+  {
+    if ((millis() - led_yellow_timestamp_) > pulse_blink_ms_)
+      ledControl(led_yellow_, led_Off);
+
+    if ((millis() - led_red_timestamp_) > tx_blink_ms_)
+      ledControl(led_red_, led_Off);
   }
 
 public:
@@ -174,12 +196,11 @@ public:
     
     ledSetup();
   
-    res_t res = HC12_setup(home_channel_);
-    if (res != Ok)
-      error();      
+    HC12_setup_retry(home_channel_); 
+
     ledControl(led_green_, led_On);
     
-    switchesSetup();    
+    switchesSetup();
     setAddress(readSwitches());
     
     cpgInputsSetup();
@@ -192,9 +213,8 @@ public:
 
     res_t r = Ok;
     
-    // Turn off blink led
-    if ((millis() - led_timestamp_) > send_blink_ms_)
-      ledControl(led_yellow_, led_Off);
+    // Turn off blink LEDs
+    ledBlinkReset();
 
     // Pulse detection
     samplePulse();   
@@ -219,6 +239,7 @@ public:
             CPGInfoQuery *qry = (CPGInfoQuery*)&p->data;
             if (qry->cpg_sequence == sequence_)
             {
+              debug((char *)"Reset backup");
               pulse_backup_ = 0;
               ++sequence_;              
             }
@@ -229,7 +250,9 @@ public:
               .cpg_count = pulse_backup_, 
               .cpg_sequence = sequence_
             };
-            replyCPGInfo(master_address_, &c);            
+            replyCPGInfo(master_address_, &c);   
+            ledBlinkStart(led_red_);  
+            debug((char *)"Sent info reply");       
           }
           // CPG Init query
           else if (p->command == cmd_CPGInitQuery && 
@@ -240,8 +263,19 @@ public:
               HC12_setup(qry->cpg_channel);
           }
           else // Command mismatch
+          {
+            debug((char *)"Command error");
             r = ECommand;            
+          }
         }
+        else
+        {
+          debug((char *)"Packet error");
+        }
+      }
+      else
+      {
+        debug((char *)"Read error");
       }
     }
   }  
