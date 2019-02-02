@@ -61,13 +61,14 @@ protected:
   const uint32_t hc12_baudrate_ = 9600; ///< HC12 baudrate [bps]
   const uint32_t usb_baudrate_ = 9600; ///< USB baudrate [bps]
   const uint8_t home_channel_ = 1; ///< Home HC12 channel 
+  const uint8_t hc12_setup_retries_max_ = 10; ///< Max HC12 setup retries
 
 private:
   pin_t led_error_; ///< LED error indicator  
   pin_t hc12_tx_; ///< HC12 Tx pin
   pin_t hc12_rx_; ///< HC12 Rx pin
   pin_t hc12_set_; ///< HC12 Set pin  
-  uint8_t hc12_channel_ = home_channel_; ///< HC12 channel  
+  uint8_t hc12_channel_ = home_channel_; ///< HC12 channel
 
 /// VARIABLES
 protected:
@@ -202,6 +203,19 @@ protected:
     delay(250); // As per datasheet    
     hc12_channel_ = channel; // Acknowledge channel set
     
+    return Ok;
+  }
+
+  /** Retry HC12 setup module */
+  res_t HC12_setup_retry(uint8_t channel)
+  {
+    res_t r;
+    uint8_t retries = 0;
+    while((r = HC12_setup(channel)) != Ok)
+    {
+      if (retries++ > hc12_setup_retries_max_)
+        error();
+    }
     return Ok;
   }
 

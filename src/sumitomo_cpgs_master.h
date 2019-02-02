@@ -56,14 +56,16 @@ private:
   
   const static uint16_t rx_blink_ms_ = 200; ///< Blink time on RX
   const static uint16_t reply_timeout_ms = 100; ///< Reply timeout
-  const static uint8_t fault_threshold_ = 10; ///< Allowed slave faults
+  const static uint32_t init_period_ms_ = 60000; ///< Init query period
 
   /// VARIABLES
   uint32_t led_timestamp_ = 0; ///< Timestamp of LED turn on
   uint32_t serial_timestamp_ = 0; ///< Timestamp of serial
+  uint32_t init_timestamp_ = 0; ///< Timestamp for last init query
 
   uint8_t sequences_[slave_number_] = {0}; ///< Sequences of slaves
-  uint8_t faults_[slave_number_] = {0}; ///< Faults of slaves
+  uint32_t slaves_mask_ = 0;
+
 
 public:
   /** Constructor */
@@ -71,6 +73,9 @@ public:
   CPG(hc12_tx_,hc12_rx_,hc12_set_, led_blue_)
   {
     setAddress(master_address_);
+    slaves_mask_ = 0;
+    for (uint8_t i = 0; i < slave_number_; ++i)
+      slaves_mask_ |= 1<<slaves_[i];    
   }
 
 /// PACKET QUERIES
@@ -95,6 +100,18 @@ private:
     ledControl(led_blue_, led_On);
   }
 
+  void ledBlinkStart()
+  {
+    ledControl(led_blue_, led_On);
+    led_timestamp_ = millis();
+  }
+
+  void ledBlinkReset()
+  {
+    if ((millis() - led_timestamp_) > rx_blink_ms_)
+      ledControl(led_blue_, led_Off);
+  }
+
 public: 
   /** Setup */ 
   void setup()
@@ -102,30 +119,30 @@ public:
     USB.begin(usb_baudrate_);
     
     ledSetup();
-    res_t res = HC12_setup(home_channel_);
-    if (res != Ok)
-      error();
-      
-    uint32_t init_slaves_ = 0;
-    for (uint8_t i = 0; i < slave_number_; ++i)
-      init_slaves_ |= 1<<slaves_[i];    
+    HC12_setup_retry(home_channel_);
       
     CPGInitQuery c = {
       .cpg_channel = master_channel_, 
-      .cpg_address = init_slaves_
+      .cpg_address = slaves_mask_
     };
     queryCPGInit(&c);
     
-    HC12_setup(master_channel_);
+    HC12_setup_retry(master_channel_);
   }
 
   /** Loop */
   void loop() 
-  {
+  {    
     res_t r = Ok;
-    uint32_t init_slaves_ = 0;
+    
+    // Reset blinking LED
+    ledBlinkReset();
+
     for (uint8_t i; i < slave_number_; ++i)
     {
+      // Reset blinking LED
+      ledBlinkReset();
+
       // Clean rx buffer
       while(HC12.available()) 
         HC12.read();
@@ -153,7 +170,7 @@ public:
               sequences_[i] = rpy->cpg_sequence;
               for (uint8_t j = 0; j < rpy->cpg_count; ++j)
                 USB.println(rpy->cpg_id);
-              faults_[i] = 0;
+              ledBlinkStart();
             }
             else // Id mismatch
               r = EId;
@@ -162,24 +179,22 @@ public:
             r = ECommand;            
         }
       }
-      else // No incoming data
-      {
-        ++faults_[i];
-        if (faults_[i] > fault_threshold_)
-          init_slaves_ |= 1<<slaves_[i];
-      }
+
     }
 
-    if (init_slaves_)
+    // Send slaves
+    if ((millis() - init_timestamp_) > init_period_ms_)
     {
-      HC12_setup(home_channel_);
+      HC12_setup_retry(home_channel_);
       CPGInitQuery c = {
-        .cpg_channel = master_channel_, 
-        .cpg_address = init_slaves_
+      .cpg_channel = master_channel_, 
+      .cpg_address = slaves_mask_
       };
       queryCPGInit(&c);
-      HC12_setup(master_channel_);
+      HC12_setup_retry(master_channel_);
+      init_timestamp_ = millis();
     }
+
   }
 };
 
