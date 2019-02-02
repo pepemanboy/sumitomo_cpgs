@@ -57,7 +57,7 @@ protected:
 protected:
   const uint8_t master_address_ = 0; ///< Address of the master
   const uint8_t broadcast_address_ = 255; ///< Address of broadcast
-  const uint16_t serial_timeout_ms_ = 1000; ///< Serial timeout [ms]
+  const uint16_t serial_timeout_ms_ = 50; ///< Serial timeout [ms]
   const uint32_t hc12_baudrate_ = 9600; ///< HC12 baudrate [bps]
   const uint32_t usb_baudrate_ = 9600; ///< USB baudrate [bps]
   const uint8_t home_channel_ = 1; ///< Home HC12 channel 
