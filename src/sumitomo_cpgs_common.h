@@ -193,6 +193,7 @@ protected:
       return r;
       
     // Set baud rate
+    memset(buf, 0, sizeof(buf));
     debug((char *)"Configuring baudrate");
     sprintf(buf, "AT+B9600");
     r = HC12_configure_parameter(buf);
