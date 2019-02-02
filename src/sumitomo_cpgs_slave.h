@@ -75,9 +75,9 @@ private:
   uint8_t pulse_backup_ = 0; ///< Pulse count backup
   uint8_t sequence_ = 0; ///< Communication sequence
   
-  const uint8_t hc12_tx_ = 6; ///< HC12 Tx pin
-  const uint8_t hc12_rx_ = 5; ///< HC12 Rx pin
-  const uint8_t hc12_set_ = 4; ///< HC12 Set pin
+  const static uint8_t hc12_tx_ = 6; ///< HC12 Tx pin
+  const static uint8_t hc12_rx_ = 5; ///< HC12 Rx pin
+  const static uint8_t hc12_set_ = 4; ///< HC12 Set pin
 
 public:
   /** Constructor */
