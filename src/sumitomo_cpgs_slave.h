@@ -247,6 +247,7 @@ public:
               ++sequence_;              
             }
             pulse_backup_ += pulse_count_;
+            pulse_count_ = 0;
             // Transmit info
             CPGInfoReply c = {
               .cpg_id = address(), 
