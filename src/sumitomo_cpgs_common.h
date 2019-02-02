@@ -127,14 +127,6 @@ protected:
     size_t len = sizeof(tx_buffer_);
     pktSerialize(p, (uint8_t *) tx_buffer_, &len);
 
-    char buf[20] = "";
-    sprintf(buf, "tx addr %d", p->address);
-    debug(buf);
-    sprintf(buf, "tx cmd %d", p->command);
-    debug(buf);
-    sprintf(buf, "tx len %d", len);
-    debug(buf);
-
     HC12.write(tx_buffer_, len);
     HC12.write((uint8_t)0); 
     HC12.flush();
@@ -151,11 +143,6 @@ protected:
     {       
       if (pktCheck(p))
       {
-        char buf[20] = "";
-        sprintf(buf, "rx addr %d", p->address);
-        debug(buf);
-        sprintf(buf, "rx cmd %d", p->address);
-        debug(buf);
         if (p->address != address() && p->address != broadcast_address_) {
           return EAddress;
         }        
@@ -208,7 +195,6 @@ protected:
       return r;
       
     // Set baud rate
-    memset(buf, 0, sizeof(buf));
     debug((char *)"Configuring baudrate");
     sprintf(buf, "AT+B9600");
     r = HC12_configure_parameter(buf);
