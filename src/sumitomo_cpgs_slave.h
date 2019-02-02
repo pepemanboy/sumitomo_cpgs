@@ -232,7 +232,7 @@ public:
       if (l)
       {        
         packet_t *p = &rx_packet_;
-        r = packetRx(p, rx_buffer_, l-1);
+        r = packetRx(p, rx_buffer_, l);
         if (r == Ok) 
         {     
           // CPG Info Query           
