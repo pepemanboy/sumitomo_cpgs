@@ -90,7 +90,7 @@ private:
   /** Query CPG Info */
   void replyCPGInfo(uint8_t address, const CPGInfoReply * c)
   {
-    queryPacket(address, cmd_CPGInfoReply, (uint8_t *)c, sizeof(c)); 
+    queryPacket(address, cmd_CPGInfoReply, (uint8_t *)c, sizeof(CPGInfoReply)); 
   }
 
 private:
@@ -129,8 +129,8 @@ private:
       reading = digitalRead(switches_[i]) ? 0 : 1;
       val |= reading << i;
     }
-    char buf[10];
-    sprintf("sw %d", val);
+    char buf[10] = "";
+    sprintf(buf, "sw %d", val);
     debug(buf);
     return val;
   }

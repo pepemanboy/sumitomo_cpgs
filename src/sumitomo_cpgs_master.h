@@ -83,13 +83,13 @@ private:
   /** Query CPG Info */
   void queryCPGInfo(uint8_t address, const CPGInfoQuery * c)
   {
-    queryPacket(address, cmd_CPGInfoQuery, (uint8_t *)c, sizeof(c)); 
+    queryPacket(address, cmd_CPGInfoQuery, (uint8_t *)c, sizeof(CPGInfoQuery)); 
   }
 
   /** Query CPG Init */
   void queryCPGInit(const CPGInitQuery * c)
   {
-    queryPacket(broadcast_address_, cmd_CPGInitQuery, (uint8_t *)c, sizeof(c)); 
+    queryPacket(broadcast_address_, cmd_CPGInitQuery, (uint8_t *)c, sizeof(CPGInitQuery)); 
   }
   
 private:
