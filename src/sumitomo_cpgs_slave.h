@@ -279,6 +279,9 @@ public:
       else
       {
         debug((char *)"Read error");
+        char buf[20] = "";
+        sprintf(buf, "rd err %d", r);
+        debug(buf);
       }
     }
   }  
