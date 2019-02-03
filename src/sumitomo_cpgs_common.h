@@ -166,6 +166,7 @@ private:
     HC12.println(query);
     debug(query);
     size_t l = HC12.readBytes(rx_buffer_, sizeof(rx_buffer_));
+    HC12.flush();
     rx_buffer_[l] = '\0';
     debug(rx_buffer_);
     if (!strstr(rx_buffer_, "OK")) 
