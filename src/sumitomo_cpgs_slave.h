@@ -239,7 +239,7 @@ public:
           if (p->command == cmd_CPGInfoQuery && 
             p->data_size == sizeof(CPGInfoQuery)) 
           {
-            CPGInfoQuery *qry = (CPGInfoQuery*)&p->data;
+            CPGInfoQuery *qry = (CPGInfoQuery*)p->data;
             if (qry->cpg_sequence == sequence_)
             {
               debug((char *)"Reset backup");
@@ -262,9 +262,9 @@ public:
           else if (p->command == cmd_CPGInitQuery && 
             p->data_size == sizeof(CPGInitQuery))
           {
-            CPGInitQuery *qry = (CPGInitQuery*)&p->data;
+            CPGInitQuery *qry = (CPGInitQuery*)p->data;
             if (qry->cpg_address & (1<<address()))
-              HC12_setup(qry->cpg_channel);
+              HC12_setup_retry(qry->cpg_channel);
           }
           else // Command mismatch
           {
