@@ -55,13 +55,15 @@ private:
   const static pin_t hc12_set_ = 7; ///< HC12 Set pin
   
   const static uint16_t rx_blink_ms_ = 200; ///< Blink time on RX
-  const static uint16_t reply_timeout_ms = 100; ///< Reply timeout
   const static uint32_t init_period_ms_ = 60000; ///< Init query period
+  const static uint32_t slave_period_ms_ = 1000; ///< Slave query period
+  const static uint16_t serial_timeout_ms_ = 1000; ///< Serial timeout [ms]
 
   /// VARIABLES
   uint32_t led_timestamp_ = 0; ///< Timestamp of LED turn on
   uint32_t serial_timestamp_ = 0; ///< Timestamp of serial
   uint32_t init_timestamp_ = 0; ///< Timestamp for last init query
+  uint32_t slave_timestamp_ = 0; ///< Timestamp for slave querying
 
   uint8_t sequences_[slave_number_] = {0}; ///< Sequences of slaves
   uint32_t slaves_mask_ = 0;
@@ -70,7 +72,7 @@ private:
 public:
   /** Constructor */
   CPG_Master():
-  CPG(hc12_tx_,hc12_rx_,hc12_set_, led_blue_)
+  CPG(hc12_tx_,hc12_rx_,hc12_set_, led_blue_, serial_timeout_ms_)
   {
     setAddress(master_address_);
     slaves_mask_ = 0;
@@ -128,6 +130,7 @@ public:
 
     queryCPGInit(&c);
     debug((char *)"Sent query CPG Init");
+    delay(100);
     
     HC12_setup_retry(master_channel_);
   }
@@ -142,6 +145,11 @@ public:
 
     for (uint8_t i; i < slave_number_; ++i)
     {
+      // Time control
+      while ((millis() - slave_timestamp_) < slave_period_ms_)
+        delay(10);
+      slave_timestamp_ = millis();
+
       // Reset blinking LED
       ledBlinkReset();
 
@@ -208,6 +216,7 @@ public:
       .cpg_address = slaves_mask_
       };
       queryCPGInit(&c);
+      delay(100);
       HC12_setup_retry(master_channel_);
       debug((char *)"Finish sending init");
       init_timestamp_ = millis();

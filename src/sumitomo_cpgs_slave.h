@@ -61,10 +61,11 @@ private:
     switch_6_
   }; ///< Usable switches for selecting address 
 
-  const static uint16_t pulse_gap_min_ms_ = 300; ///< Minimum gap between pulses [ms]
+  const static uint16_t pulse_gap_min_ms_ = 50; ///< Minimum gap between pulses [ms]
   const static uint16_t tx_blink_ms_ = 200; ///< Send blink LED duration [ms]
   const static uint16_t init_delay_ms = 2000; ///< Initialization delay [ms]
   const static uint16_t pulse_blink_ms_ = 200; ///< Pulse blink LED duration [ms]
+  const static uint16_t serial_timeout_ms_ = 100; ///< Serial timeout [ms]
 
 private:
   /// VARIABLES
@@ -82,7 +83,7 @@ private:
 public:
   /** Constructor */
   CPG_Slave():
-  CPG(hc12_tx_, hc12_rx_, hc12_set_, led_red_)
+  CPG(hc12_tx_, hc12_rx_, hc12_set_, led_red_, serial_timeout_ms_)
   {}
 
 /// PACKET QUERIES

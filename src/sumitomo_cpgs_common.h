@@ -57,13 +57,13 @@ protected:
 protected:
   const uint8_t master_address_ = 0; ///< Address of the master
   const uint8_t broadcast_address_ = 255; ///< Address of broadcast
-  const uint16_t serial_timeout_ms_ = 1000; ///< Serial timeout [ms]
   const uint32_t hc12_baudrate_ = 9600; ///< HC12 baudrate [bps]
   const uint32_t usb_baudrate_ = 9600; ///< USB baudrate [bps]
   const uint8_t home_channel_ = 1; ///< Home HC12 channel 
   const uint8_t hc12_setup_retries_max_ = 10; ///< Max HC12 setup retries
 
 private:
+  uint16_t serial_timeout_ms_ = 1000; ///< Serial timeout [ms]
   pin_t led_error_; ///< LED error indicator  
   pin_t hc12_tx_; ///< HC12 Tx pin
   pin_t hc12_rx_; ///< HC12 Rx pin
@@ -87,12 +87,13 @@ protected:
 /// FUNCTIONS
 protected:  
   /** Constructor */
-  CPG(pin_t hc12_tx, pin_t hc12_rx, pin_t hc12_set, pin_t led_error):
+  CPG(pin_t hc12_tx, pin_t hc12_rx, pin_t hc12_set, pin_t led_error, uint16_t serial_timeout_ms):
   hc12_tx_(hc12_tx),
   hc12_rx_(hc12_rx),
   hc12_set_(hc12_set),
   HC12(hc12_rx, hc12_tx),
-  led_error_(led_error)
+  led_error_(led_error),
+  serial_timeout_ms_(serial_timeout_ms)
   {}
 
   /** Set and get address */
