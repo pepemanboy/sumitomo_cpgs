@@ -160,9 +160,13 @@ public:
       // Query Info
       CPGInfoQuery c = {.cpg_sequence = sequences_[i]};
       queryCPGInfo(slaves_[i], &c);
+
+      // Debug
+      #ifdef DEBUG
       char buf[10] = "";
       sprintf(buf, "qry slv %d", slaves_[i]);
       debug(buf);
+      #endif
 
       // Wait for reply
       size_t l = HC12.readBytesUntil(0, rx_buffer_, sizeof(rx_buffer_));

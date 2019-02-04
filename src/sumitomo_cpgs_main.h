@@ -32,7 +32,7 @@
 
 /// CONFIGURABLE DEFINES
 #define MASTER
-#define DEBUG
+// #define DEBUG
 
 /// INSTANTIATE OBJECT
 #ifdef MASTER
