@@ -226,6 +226,7 @@ public:
     // Receive data
     if (HC12.available())
     {
+      debug((char *)"Received something");
       // Wait for reply
       size_t l = HC12.readBytesUntil(0, rx_buffer_, sizeof(rx_buffer_));
 
@@ -233,9 +234,11 @@ public:
       if (l)
       {        
         packet_t *p = &rx_packet_;
+        debug((char *)"Processing");
         r = packetRx(p, rx_buffer_, l);
         if (r == Ok) 
         {     
+          debug((char *)"packetrx ok");
           // CPG Info Query           
           if (p->command == cmd_CPGInfoQuery && 
             p->data_size == sizeof(CPGInfoQuery)) 
@@ -244,6 +247,7 @@ public:
             if (qry->cpg_sequence == sequence_)
             {
               debug((char *)"Reset backup");
+              ledBlinkStart(led_red_); 
               pulse_backup_ = 0;
               ++sequence_;              
             }
@@ -255,8 +259,7 @@ public:
               .cpg_count = pulse_backup_, 
               .cpg_sequence = sequence_
             };
-            replyCPGInfo(master_address_, &c);   
-            ledBlinkStart(led_red_);  
+            replyCPGInfo(master_address_, &c);    
             debug((char *)"Sent info reply");       
           }
           // CPG Init query
@@ -264,8 +267,11 @@ public:
             p->data_size == sizeof(CPGInitQuery))
           {
             CPGInitQuery *qry = (CPGInitQuery*)p->data;
-            if (qry->cpg_address & (1<<address()))
+            if (qry->cpg_address & addressMask())
+            {
               HC12_setup_retry(qry->cpg_channel);
+              ledBlinkStart(led_red_); 
+            }
           }
           else // Command mismatch
           {
@@ -275,9 +281,6 @@ public:
         }
         else
         {
-          char buf[20] = "";
-          sprintf(buf, "pkt err %d", r);
-          debug(buf);
           debug((char *)"Packet error");
         }
       }

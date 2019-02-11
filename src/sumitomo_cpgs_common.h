@@ -99,6 +99,7 @@ protected:
   /** Set and get address */
   void setAddress(uint8_t address) { address_ = address;}
   uint8_t address() { return address_; }
+  uint32_t addressMask() { return ((uint32_t)1)<<address_;}
 
   /** Get HC12 channel */
   uint8_t HC12Channel() { return hc12_channel_; }

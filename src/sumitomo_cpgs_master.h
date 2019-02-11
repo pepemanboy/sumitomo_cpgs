@@ -55,7 +55,7 @@ private:
   const static pin_t hc12_set_ = 7; ///< HC12 Set pin
   
   const static uint16_t rx_blink_ms_ = 200; ///< Blink time on RX
-  const static uint32_t init_period_ms_ = 60000; ///< Init query period
+  const static uint32_t init_period_ms_ = 60000 + (master_channel_*10); ///< Init query period
   const static uint32_t slave_period_ms_ = 1000; ///< Slave query period
   const static uint16_t serial_timeout_ms_ = 1000; ///< Serial timeout [ms]
 
@@ -77,7 +77,7 @@ public:
     setAddress(master_address_);
     slaves_mask_ = 0;
     for (uint8_t i = 0; i < slave_number_; ++i)
-      slaves_mask_ |= 1<<slaves_[i];    
+      slaves_mask_ |= ((uint32_t)1)<<slaves_[i];    
   }
 
 /// PACKET QUERIES
@@ -139,15 +139,17 @@ public:
   void loop() 
   {    
     res_t r = Ok;
-
-    // Reset blinking LED
+    
     ledBlinkReset();
 
     for (uint8_t i; i < slave_number_; ++i)
     {
       // Time control
       while ((millis() - slave_timestamp_) < slave_period_ms_)
+      {
+        ledBlinkReset();
         delay(10);
+      }
       slave_timestamp_ = millis();
 
       // Reset blinking LED
