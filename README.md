@@ -1,15 +1,22 @@
 # Production monitor
 
-We developed electronics, firmware, and software to create a system that monitors a production line in a wire assembly factory.
+We developed electronics, firmware, and software to create a system that monitors a production line in a wire assembly factory. We are currently monitoring 5 production lines and our devices have been working for a year now with no issues.
 
 The following diagram illustrates the system:
 CPG is the customer's propietary hardware, that emits a digital signal when a part is completed.
 
+![CPG system diagram](https://github.com/pepemanboy/sumitomo_cpgs/blob/master/img/sumitomo_cpg_diagram.PNG)
+
 There can exist multiple systems in the same physical space, thus we have to deal with different RF channels to avoid interference.
 
+## Electronics
+Schematic and pcb for the slave devices are in the electronics folder.
+Master is just an Arduino UNO with a HC12 antenna.
 
+Here is a picture of a bunch of slaves:
+![CPG slaves](https://github.com/pepemanboy/sumitomo_cpgs/blob/master/img/sumitomo_cpg_slaves.jpg)
 
-## Algorithm
+## Firmware
 
 ### CPG signal
 Slave polls the digital signal of the CPG, and increments an internal counter.
